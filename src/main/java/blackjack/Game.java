@@ -24,9 +24,11 @@ public class Game {
 		Scanner scanner = new Scanner(System.in);
 		String names = scanner.nextLine();
 		List<Player> players = Arrays.stream(names.split(",")).map(Player::new).toList();
-		Player dealer = new Player("dealer");
+		Player dealer = new Player("딜러");
 
 		System.out.println("딜러와 " + String.join(", ", players.stream().map(Player::getName).toList()) + "에게 2장의 카드를 나누었습니다.");
+
+		List<Card> shuffledDeck = shuffleDeck(createDeck());
 //		1.
 //		dealer.addCards(generateCard(), generateCard());
 //		2.
@@ -45,24 +47,30 @@ public class Game {
 //		6.
 //		dealer.addCards(IntStream.range(0, 2).mapToObj(i -> generateCard()).collect(Collectors.toSet()));
 
-		dealer.addFirstCards(generateCards());
+		dealer.addFirstCards(generateCards(shuffledDeck));
 
-		players.forEach(player -> player.addFirstCards(generateCards()));
+		players.forEach(player -> player.addFirstCards(generateCards(shuffledDeck)));
+
+		System.out.println(dealer);
+		players.forEach(System.out::println);
+
+		players.forEach(player -> {
+			System.out.println(player + "는 한장의 카드를 더 받겠습니까?(예는 y, 아니오는 n)");
+			String names = scanner.nextLine();
+
+		});
 	}
 
-	private Card generateCard() {
-		Card newCard = new Card(newDenomination(), newSuit());
-		while (isDuplicateCard(newCard)) {
-			newCard = new Card(newDenomination(), newSuit());
-		}
+	private Card generateCard(List<Card> shuffledDeck) {
+		Card newCard = new Card(shuffledDeck.remove(shuffledDeck.size() - 1));
 		alreadyCards.add(newCard);
 		return newCard;
 	}
 
-	private List<Card> generateCards() {
+	private List<Card> generateCards(List<Card> shuffledDeck) {
 		List<Card> cards = new ArrayList<>();
 		for (int i = 0; i < 2; i++) {
-			cards.add(generateCard());
+			cards.add(generateCard(shuffledDeck));
 		}
 		return cards;
 	}
@@ -82,4 +90,17 @@ public class Game {
 		int randIdx = random.nextInt(Util.suitCandidates.size());
 		return Util.suitCandidates.get(randIdx);
 	}
+
+	private static List<Card> createDeck() {
+		return Util.denominationCandidates.stream()
+		                             .flatMap(denomination -> Util.suitCandidates.stream()
+		                                                                    .map(suit -> new Card(denomination, suit)))
+		                             .collect(Collectors.toList());
+	}
+
+	private static List<Card> shuffleDeck(List<Card> deck) {
+		Collections.shuffle(deck);
+		return deck;
+	}
+
 }

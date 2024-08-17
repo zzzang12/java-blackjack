@@ -28,8 +28,11 @@ public class Player {
 	}
 
 	public void addFirstCards(Collection<Card> cards) {
-		for (int i = 0; i < 2; i++) {
-			this.addCards(cards);
-		}
+		this.addCards(cards);
+	}
+
+	@Override
+	public String toString() {
+		return name + "카드: " + String.join(", ", cards.stream().map(Card::toString).toList());
 	}
 }
